@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 class Program
 {
@@ -45,7 +47,7 @@ class Program
 
 class Entry
 {
-    public string Date { get; private set; } // Prevent external modifications
+    public string Date { get; set; } // Allow modification within the class
     public string Prompt { get; set; }
     public string Response { get; set; }
 
@@ -69,9 +71,7 @@ class Entry
     public static Entry FromFileFormat(string line)
     {
         string[] parts = line.Split('|');
-        Entry entry = new Entry(parts[1], parts[2]);
-        entry.Date = parts[0];
-        return entry;
+        return new Entry(parts[1], parts[2]) { Date = parts[0] };
     }
 }
 
