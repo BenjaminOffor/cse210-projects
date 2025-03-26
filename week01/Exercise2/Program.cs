@@ -1,68 +1,39 @@
 using System;
+using System.Collections.Generic;
 
 class Program
 {
     static void Main(string[] args)
     {
-      // Ask the user for their grade percentage
-        Console.Write("Enter your grade percentage: ");
-        int grade = int.Parse(Console.ReadLine());
-        
-        string letter = "";
-        string sign = "";
-        
-        // Determine the letter grade
-        if (grade >= 90)
+        List<Entry> entries = new List<Entry>();
+
+        string[] lines = System.IO.File.ReadAllLines("entries.txt");
+        foreach (string line in lines)
         {
-            letter = "A";
-        }
-        else if (grade >= 80)
-        {
-            letter = "B";
-        }
-        else if (grade >= 70)
-        {
-            letter = "C";
-        }
-        else if (grade >= 60)
-        {
-            letter = "D";
-        }
-        else
-        {
-            letter = "F";
-        }
-        
-        // Determine the sign (+ or -)
-        int lastDigit = grade % 10;
-        
-        if (letter != "A" && letter != "F") // A+ does not exist, and F has no +/-
-        {
-            if (lastDigit >= 7)
+            string[] parts = line.Split('|');
+            if (parts.Length == 3)
             {
-                sign = "+";
-            }
-            else if (lastDigit < 3)
-            {
-                sign = "-";
+                entries.Add(new Entry(parts[0], parts[1], parts[2])); // ✅ Fixed
             }
         }
-        else if (letter == "A" && lastDigit < 3)
+
+        foreach (Entry entry in entries)
         {
-            sign = "-"; // A- is valid
+            Console.WriteLine($"{entry.Date}: {entry.Prompt} - {entry.Response}");
         }
-        
-        // Display the final letter grade
-        Console.WriteLine($"Your letter grade is: {letter}{sign}");
-        
-        // Check if the student passed or failed
-        if (grade >= 70)
-        {
-            Console.WriteLine("Congratulations! You passed the class.");
-        }
-        else
-        {
-            Console.WriteLine("Don't give up! Keep working hard for next time.");
-        }
+    }
+}
+
+public class Entry
+{
+    public string Date { get; }  // Read-only property
+    public string Prompt { get; }
+    public string Response { get; }
+
+    public Entry(string date, string prompt, string response)
+    {
+        Date = date;
+        Prompt = prompt;
+        Response = response;
     }
 }

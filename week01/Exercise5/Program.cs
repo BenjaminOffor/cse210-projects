@@ -4,39 +4,149 @@ class Program
 {
     static void Main(string[] args)
     {
-        DisplayWelcome();
+        Journal myJournal = new Journal();
+        Console.WriteLine("Hello World! This is the Journal Project.\n");
         
-        string userName = PromptUserName();
-        int userNumber = PromptUserNumber();
-        int squaredNumber = SquareNumber(userNumber);
+        while (true)
+        {
+            Console.WriteLine("Choose an option:");
+            Console.WriteLine("1. Write a new entry");
+            Console.WriteLine("2. Display the journal");
+            Console.WriteLine("3. Save the journal to a file");
+            Console.WriteLine("4. Load the journal from a file");
+            Console.WriteLine("5. Exit");
+            Console.Write("Enter your choice: ");
+
+            string choice = Console.ReadLine();
+            
+            switch (choice)
+            {
+                case "1":
+                    myJournal.AddEntry();
+                    break;
+                case "2":
+                    myJournal.DisplayEntries();
+                    break;
+                case "3":
+                    myJournal.SaveToFile();
+                    break;
+                case "4":
+                    myJournal.LoadFromFile();
+                    break;
+                case "5":
+                    return;
+                default:
+                    Console.WriteLine("Invalid choice. Please try again.");
+                    break;
+            }
+        }
+    }
+}
+
+class Entry
+{
+    public string Date { get; private set; } // Prevent external modifications
+    public string Prompt { get; set; }
+    public string Response { get; set; }
+
+    public Entry(string prompt, string response)
+    {
+        Date = DateTime.Now.ToString("yyyy-MM-dd");
+        Prompt = prompt;
+        Response = response;
+    }
+
+    public void Display()
+    {
+        Console.WriteLine($"Date: {Date}\nPrompt: {Prompt}\nResponse: {Response}\n");
+    }
+
+    public string ToFileFormat()
+    {
+        return $"{Date}|{Prompt}|{Response}";
+    }
+
+    public static Entry FromFileFormat(string line)
+    {
+        string[] parts = line.Split('|');
+        Entry entry = new Entry(parts[1], parts[2]);
+        entry.Date = parts[0];
+        return entry;
+    }
+}
+
+class Journal
+{
+    private List<Entry> _entries = new List<Entry>();
+    private List<string> _prompts = new List<string>
+    {
+        "Who was the most interesting person I interacted with today?",
+        "What was the best part of my day?",
+        "How did I see the hand of the Lord in my life today?",
+        "What was the strongest emotion I felt today?",
+        "If I had one thing I could do over today, what would it be?"
+    };
+
+    public void AddEntry()
+    {
+        Random rnd = new Random();
+        string prompt = _prompts[rnd.Next(_prompts.Count)];
+
+        Console.WriteLine($"Prompt: {prompt}");
+        Console.Write("Your response: ");
+        string response = Console.ReadLine();
         
-        DisplayResult(userName, squaredNumber);
+        _entries.Add(new Entry(prompt, response));
+        Console.WriteLine("Entry added successfully!\n");
     }
 
-    static void DisplayWelcome()
+    public void DisplayEntries()
     {
-        Console.WriteLine("Welcome to the program!");
+        if (_entries.Count == 0)
+        {
+            Console.WriteLine("No entries found.");
+            return;
+        }
+        
+        foreach (var entry in _entries)
+        {
+            entry.Display();
+        }
     }
 
-    static string PromptUserName()
+    public void SaveToFile()
     {
-        Console.Write("Please enter your name: ");
-        return Console.ReadLine();
+        Console.Write("Enter filename to save: ");
+        string filename = Console.ReadLine();
+
+        using (StreamWriter writer = new StreamWriter(filename))
+        {
+            foreach (var entry in _entries)
+            {
+                writer.WriteLine(entry.ToFileFormat());
+            }
+        }
+
+        Console.WriteLine("Journal saved successfully!\n");
     }
 
-    static int PromptUserNumber()
+    public void LoadFromFile()
     {
-        Console.Write("Please enter your favorite number: ");
-        return int.Parse(Console.ReadLine());
-    }
+        Console.Write("Enter filename to load: ");
+        string filename = Console.ReadLine();
 
-    static int SquareNumber(int number)
-    {
-        return number * number;
-    }
+        if (!File.Exists(filename))
+        {
+            Console.WriteLine("File not found.\n");
+            return;
+        }
 
-    static void DisplayResult(string name, int squaredNumber)
-    {
-        Console.WriteLine($"{name}, the square of your number is {squaredNumber}");
+        _entries.Clear();
+        foreach (string line in File.ReadAllLines(filename))
+        {
+            _entries.Add(Entry.FromFileFormat(line));
+        }
+        
+        Console.WriteLine("Journal loaded successfully!\n");
     }
 }
