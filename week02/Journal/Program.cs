@@ -1,9 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 
-class Program
+class Entry
 {
-    static void Main(string[] args)
-    {
     public string Date { get; set; }
     public string Prompt { get; set; }
     public string Response { get; set; }
@@ -105,5 +105,48 @@ class Journal
         }
         
         Console.WriteLine("Journal loaded successfully!\n");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Journal journal = new Journal();
+        bool running = true;
+
+        while (running)
+        {
+            Console.WriteLine("Choose an option:");
+            Console.WriteLine("1. Add Entry");
+            Console.WriteLine("2. Display Entries");
+            Console.WriteLine("3. Save to File");
+            Console.WriteLine("4. Load from File");
+            Console.WriteLine("5. Exit");
+            Console.Write("Enter choice: ");
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    journal.AddEntry();
+                    break;
+                case "2":
+                    journal.DisplayEntries();
+                    break;
+                case "3":
+                    journal.SaveToFile();
+                    break;
+                case "4":
+                    journal.LoadFromFile();
+                    break;
+                case "5":
+                    running = false;
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice! Try again.");
+                    break;
+            }
+        }
     }
 }
