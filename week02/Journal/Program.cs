@@ -2,11 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-class Entry
+// Abstraction: Defines an interface for entries in the journal
+public interface IEntry
 {
-    public string Date { get; set; }
-    public string Prompt { get; set; }
-    public string Response { get; set; }
+    void Display();
+    string ToFileFormat();
+}
+
+// Concrete implementation of IEntry
+public class Entry : IEntry
+{
+    public string Date { get; private set; }
+    public string Prompt { get; private set; }
+    public string Response { get; private set; }
 
     public Entry(string prompt, string response)
     {
@@ -28,13 +36,24 @@ class Entry
     public static Entry FromFileFormat(string line)
     {
         string[] parts = line.Split('|');
+        if (parts.Length < 3) throw new FormatException("Invalid file format.");
         return new Entry(parts[1], parts[2]) { Date = parts[0] };
     }
 }
 
-class Journal
+// Abstraction: Defines an interface for journal operations
+public interface IJournal
 {
-    private List<Entry> _entries = new List<Entry>();
+    void AddEntry();
+    void DisplayEntries();
+    void SaveToFile();
+    void LoadFromFile();
+}
+
+// Concrete implementation of IJournal
+public class Journal : IJournal
+{
+    private List<IEntry> _entries = new List<IEntry>();
     private List<string> _prompts = new List<string>
     {
         "Who was the most interesting person I interacted with today?",
@@ -52,7 +71,7 @@ class Journal
         Console.WriteLine($"Prompt: {prompt}");
         Console.Write("Your response: ");
         string response = Console.ReadLine();
-        
+
         _entries.Add(new Entry(prompt, response));
         Console.WriteLine("Entry added successfully!\n");
     }
@@ -64,7 +83,7 @@ class Journal
             Console.WriteLine("No entries found.");
             return;
         }
-        
+
         foreach (var entry in _entries)
         {
             entry.Display();
@@ -76,15 +95,21 @@ class Journal
         Console.Write("Enter filename to save: ");
         string filename = Console.ReadLine();
 
-        using (StreamWriter writer = new StreamWriter(filename))
+        try
         {
-            foreach (var entry in _entries)
+            using (StreamWriter writer = new StreamWriter(filename))
             {
-                writer.WriteLine(entry.ToFileFormat());
+                foreach (var entry in _entries)
+                {
+                    writer.WriteLine(entry.ToFileFormat());
+                }
             }
+            Console.WriteLine("Journal saved successfully!\n");
         }
-
-        Console.WriteLine("Journal saved successfully!\n");
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving file: {ex.Message}");
+        }
     }
 
     public void LoadFromFile()
@@ -98,21 +123,28 @@ class Journal
             return;
         }
 
-        _entries.Clear();
-        foreach (string line in File.ReadAllLines(filename))
+        try
         {
-            _entries.Add(Entry.FromFileFormat(line));
+            _entries.Clear();
+            foreach (string line in File.ReadAllLines(filename))
+            {
+                _entries.Add(Entry.FromFileFormat(line));
+            }
+            Console.WriteLine("Journal loaded successfully!\n");
         }
-        
-        Console.WriteLine("Journal loaded successfully!\n");
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading file: {ex.Message}");
+        }
     }
 }
 
+// Main Program
 class Program
 {
     static void Main()
     {
-        Journal journal = new Journal();
+        IJournal journal = new Journal();
         bool running = true;
 
         while (running)
