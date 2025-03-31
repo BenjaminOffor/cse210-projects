@@ -6,12 +6,10 @@ class Program
 {
     static void Main()
     {
-        // Initialize scripture
         Scripture scripture = new Scripture(new Reference("Proverbs", 3, 5, 6), 
             "Trust in the Lord with all your heart and lean not on your own understanding; " +
             "in all your ways submit to him, and he will make your paths straight.");
 
-        // Game loop
         while (!scripture.AllWordsHidden())
         {
             Console.Clear();
@@ -21,10 +19,9 @@ class Program
             string input = Console.ReadLine();
             if (input.ToLower() == "quit") break;
 
-            scripture.HideRandomWords(3); // Hide 3 words at a time
+            scripture.HideRandomWords(3);
         }
 
-        // Final display before exiting
         Console.Clear();
         Console.WriteLine(scripture.GetDisplayText());
         Console.WriteLine("\nAll words hidden. Press any key to exit.");
@@ -32,13 +29,12 @@ class Program
     }
 }
 
-// Class to represent the scripture reference (e.g., "Proverbs 3:5-6")
 class Reference
 {
-    public string Book { get; }
-    public int StartVerse { get; }
-    public int EndVerse { get; }
-    public int Chapter { get; }
+    private string Book { get; }
+    private int StartVerse { get; }
+    private int EndVerse { get; }
+    private int Chapter { get; }
 
     public Reference(string book, int chapter, int startVerse, int endVerse = -1)
     {
@@ -56,10 +52,9 @@ class Reference
     }
 }
 
-// Class to represent a single word
 class Word
 {
-    public string Text { get; }
+    private string Text { get; }
     private bool isHidden;
 
     public Word(string text)
@@ -68,23 +63,13 @@ class Word
         isHidden = false;
     }
 
-    public void Hide()
-    {
-        isHidden = true;
-    }
+    public void Hide() => isHidden = true;
 
-    public string GetDisplayText()
-    {
-        return isHidden ? new string('_', Text.Length) : Text;
-    }
+    public string GetDisplayText() => isHidden ? new string('_', Text.Length) : Text;
 
-    public bool IsHidden()
-    {
-        return isHidden;
-    }
+    public bool IsHidden() => isHidden;
 }
 
-// Class to represent the scripture
 class Scripture
 {
     private Reference reference;
@@ -100,24 +85,17 @@ class Scripture
     public void HideRandomWords(int count)
     {
         var visibleWords = words.Where(w => !w.IsHidden()).ToList();
-
         if (visibleWords.Count == 0) return;
 
         for (int i = 0; i < count && visibleWords.Count > 0; i++)
         {
             int index = random.Next(visibleWords.Count);
             visibleWords[index].Hide();
-            visibleWords.RemoveAt(index); // Remove to prevent rehiding
+            visibleWords.RemoveAt(index);
         }
     }
 
-    public bool AllWordsHidden()
-    {
-        return words.All(w => w.IsHidden());
-    }
+    public bool AllWordsHidden() => words.All(w => w.IsHidden());
 
-    public string GetDisplayText()
-    {
-        return $"{reference}\n" + string.Join(" ", words.Select(w => w.GetDisplayText()));
-    }
+    public string GetDisplayText() => $"{reference}\n" + string.Join(" ", words.Select(w => w.GetDisplayText()));
 }
