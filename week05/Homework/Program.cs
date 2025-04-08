@@ -1,47 +1,49 @@
 using System;
 
-class Program
+namespace MindfulnessProgram
 {
-    static void Main(string[] args)
+    class Program
     {
-        bool running = true;
-
-        while (running)
+        static void Main(string[] args)
         {
-            Console.Clear();
-            Console.WriteLine("Mindfulness Program");
-            Console.WriteLine("------------------");
-            Console.WriteLine("Menu Options:");
-            Console.WriteLine("1. Start Breathing Activity");
-            Console.WriteLine("2. Start Reflecting Activity");
-            Console.WriteLine("3. Start Listing Activity");
-            Console.WriteLine("4. Quit");
-            Console.Write("Select a choice from the menu (1-4): ");
-            
-            string choice = Console.ReadLine();
+            bool exit = false;
 
-            switch (choice)
+            while (!exit)
             {
-                case "1":
-                    BreathingActivity breathing = new BreathingActivity();
-                    breathing.Run();
-                    break;
-                case "2":
-                    ReflectingActivity reflecting = new ReflectingActivity();
-                    reflecting.Run();
-                    break;
-                case "3":
-                    ListingActivity listing = new ListingActivity();
-                    listing.Run();
-                    break;
-                case "4":
-                    running = false;
-                    Console.WriteLine("Thank you for using the Mindfulness Program. Goodbye!");
-                    break;
-                default:
-                    Console.WriteLine("Invalid choice, please select 1–4.");
-                    Thread.Sleep(2000); // Small pause to let user read the message
-                    break;
+                Console.Clear();
+                Console.WriteLine("Mindfulness Program");
+                Console.WriteLine("Menu Options:");
+                Console.WriteLine("1. Start Breathing Activity");
+                Console.WriteLine("2. Start Reflection Activity");
+                Console.WriteLine("3. Start Listing Activity");
+                Console.WriteLine("4. Quit");
+                Console.Write("Select a choice from the menu: ");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        BreathingActivity breathing = new BreathingActivity();
+                        breathing.StartActivity();
+                        break;
+                    case "2":
+                        ReflectionActivity reflection = new ReflectionActivity();
+                        reflection.StartActivity();
+                        break;
+                    case "3":
+                        ListingActivity listing = new ListingActivity();
+                        listing.StartActivity();
+                        break;
+                    case "4":
+                        exit = true;
+                        Console.WriteLine("Goodbye!");
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        Thread.Sleep(2000);
+                        break;
+                }
             }
         }
     }
